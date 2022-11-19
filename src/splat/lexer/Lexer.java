@@ -16,12 +16,12 @@ public class Lexer {
 	private int line = 1, col = 0;
 
 	// expandable list of symbolic keywords
-	private List<String> whitelist = Arrays.asList("+", "-", "*", "/", "%", ";", ",", "(", ")",
+	private final List<String> whitelist = Arrays.asList("+", "-", "*", "/", "%", ";", ",", "(", ")",
 			"[", "]", "{", "}", "\"", "=", "<", ">", ":", "==", "<=", ">=", ":=");
 	// symbols which are part of the complex operators, but invalid individually.
 	// blackList must be in whitelist
-	private List<String> blacklist = Arrays.asList("=");
-	private List<Character> delimiters = Arrays.asList(' ', '\t', '\n', '\r');
+	private final List<String> blacklist = Arrays.asList("=");
+	private final List<Character> delimiters = Arrays.asList(' ', '\t', '\n', '\r');
 
 	private String lexeme = "";
 
@@ -125,7 +125,7 @@ public class Lexer {
 				}
 
 				// if current character is a valid label character, then
-				if (isLabelChar(character)) {
+				if (isLabelChar(character) || character == '\"') {
 					// if lexeme is a label, then
 					if (isLabelChar(lexeme.charAt(lexeme.length() - 1))) {
 						// check for label validity (not starting with a digit)
