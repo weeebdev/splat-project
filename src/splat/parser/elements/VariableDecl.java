@@ -1,20 +1,29 @@
 package splat.parser.elements;
 
 import splat.lexer.Token;
+import splat.parser.elements.constants.types.Type;
+import splat.parser.elements.expressions.LabelExpr;
 
 public class VariableDecl extends Declaration {
 
-	// Need to add some fields
-	
-	// Need to add extra arguments for setting fields in the constructor 
-	public VariableDecl(Token tok) {
+	private LabelExpr label;
+	private Type type;
+
+	public VariableDecl(Token tok, LabelExpr label, Type type) {
 		super(tok);
+		this.label = label;
+		this.type = type;
 	}
 
-	// Getters?
-	
-	// Fix this as well
+	public LabelExpr getLabel() {
+		return label;
+	}
+
+	public Type getType() {
+		return type;
+	}
+
 	public String toString() {
-		return null;
+		return String.format("%s : %s;", label, type);
 	}
 }
