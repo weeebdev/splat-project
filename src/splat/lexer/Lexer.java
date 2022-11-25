@@ -17,7 +17,7 @@ public class Lexer {
 
 	// expandable list of symbolic keywords
 	private final List<String> whitelist = Arrays.asList("+", "-", "*", "/", "%", ";", ",", "(", ")",
-			"[", "]", "{", "}", "\"", "=", "<", ">", ":", "==", "<=", ">=", ":=");
+			"[", "]", "{", "}", "=", "<", ">", ":", "==", "<=", ">=", ":=");
 	// symbols which are part of the complex operators, but invalid individually.
 	// blackList must be in whitelist
 	private final List<String> blacklist = Arrays.asList("=");
@@ -116,7 +116,7 @@ public class Lexer {
 
 				// if lexeme is empty then add any valid character
 				if (lexeme.isEmpty()) {
-					if (isLabelChar(character) || isSymbolChar(character)) {
+					if (isLabelChar(character) || isSymbolChar(character) || character == '\"') {
 						lexeme += character;
 						continue;
 					} else {
@@ -124,8 +124,18 @@ public class Lexer {
 					}
 				}
 
+				if (character == '\"') {
+					if (isLabelChar(lexeme.charAt(lexeme.length() - 1))) {
+						tokens.add(new Token(lexeme, line, col - 1));
+					} else {
+						this.tokenizeSymbols();
+					}
+					lexeme = "\"";
+					continue;
+				}
+
 				// if current character is a valid label character, then
-				if (isLabelChar(character) || character == '\"') {
+				if (isLabelChar(character)) {
 					// if lexeme is a label, then
 					if (isLabelChar(lexeme.charAt(lexeme.length() - 1))) {
 						// check for label validity (not starting with a digit)

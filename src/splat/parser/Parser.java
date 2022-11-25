@@ -295,7 +295,7 @@ public class Parser {
 		} else if (peekTwoAhead(Keyword.OPEN_PAREN)) {
 			return parseCallStmt();
 		} else {
-			throw new ParseException("Statement expected", tokens.get(0));
+			throw new ParseException("Statement expected, got " + tokens.get(0).getValue(), tokens.get(0));
 		}
 	}
 

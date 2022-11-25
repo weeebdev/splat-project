@@ -234,7 +234,7 @@ public class SplatTester {
 		int ch = reader.read();
 
 		while (ch != -1) {
-			System.out.print(ch);
+			System.out.print((char) ch);
 			ch = reader.read();
 		}
 

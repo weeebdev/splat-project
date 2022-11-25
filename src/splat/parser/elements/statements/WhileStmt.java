@@ -3,6 +3,9 @@ package splat.parser.elements.statements;
 import java.util.List;
 import java.util.Map;
 
+import splat.executor.ExecutionException;
+import splat.executor.ReturnFromCall;
+import splat.executor.Value;
 import splat.lexer.Token;
 import splat.parser.elements.Expression;
 import splat.parser.elements.FunctionDecl;
@@ -42,6 +45,18 @@ public class WhileStmt extends Statement {
 
 		for (Statement stmt : stmts) {
 			stmt.analyze(funcMap, varAndParamMap);
+		}
+	}
+
+	@Override
+	public void execute(Map<String, FunctionDecl> funcMap, Map<String, Value> varAndParamMap)
+			throws ReturnFromCall, ExecutionException {
+		boolean b = (boolean) expr.evaluate(funcMap, varAndParamMap).getValue();
+		while (b) {
+			for (Statement stmt : stmts) {
+				stmt.execute(funcMap, varAndParamMap);
+			}
+			b = (boolean) expr.evaluate(funcMap, varAndParamMap).getValue();
 		}
 	}
 }

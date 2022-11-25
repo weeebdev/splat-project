@@ -2,6 +2,9 @@ package splat.parser.elements.expressions;
 
 import java.util.Map;
 
+import splat.executor.ExecutionException;
+import splat.executor.Value;
+import splat.executor.values.ValueFac;
 import splat.lexer.Token;
 import splat.parser.elements.Expression;
 import splat.parser.elements.FunctionDecl;
@@ -55,5 +58,24 @@ public class UnaryOpExp extends Expression {
 		}
 
 		return null;
+	}
+
+	@Override
+	public Value evaluate(Map<String, FunctionDecl> funcMap, Map<String, Value> varAndParamMap)
+			throws ExecutionException {
+		Value val = expr.evaluate(funcMap, varAndParamMap);
+
+		switch (val.getType().getType()) {
+			case Type.BOOLEAN: {
+				boolean b = (boolean) val.getValue();
+				return ValueFac.createValue(Type.BOOLEAN, !b);
+			}
+			case Type.INTEGER: {
+				int i = (int) val.getValue();
+				return ValueFac.createValue(Type.INTEGER, -i);
+			}
+			default:
+				throw new ExecutionException("Invalid type for unary operator", this);
+		}
 	}
 }

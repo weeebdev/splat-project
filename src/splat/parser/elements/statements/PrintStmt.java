@@ -2,6 +2,9 @@ package splat.parser.elements.statements;
 
 import java.util.Map;
 
+import splat.executor.ExecutionException;
+import splat.executor.ReturnFromCall;
+import splat.executor.Value;
 import splat.lexer.Token;
 import splat.parser.elements.Expression;
 import splat.parser.elements.FunctionDecl;
@@ -29,5 +32,12 @@ public class PrintStmt extends Statement {
 	public void analyze(Map<String, FunctionDecl> funcMap, Map<String, Type> varAndParamMap)
 			throws SemanticAnalysisException {
 		expr.analyzeAndGetType(funcMap, varAndParamMap);
+	}
+
+	@Override
+	public void execute(Map<String, FunctionDecl> funcMap, Map<String, Value> varAndParamMap)
+			throws ReturnFromCall, ExecutionException {
+		Value val = expr.evaluate(funcMap, varAndParamMap);
+		System.out.print(val);
 	}
 }

@@ -1,11 +1,18 @@
 package splat.parser.elements.expressions;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import splat.executor.ExecutionException;
+import splat.executor.ReturnFromCall;
+import splat.executor.Value;
+import splat.executor.values.ValueFac;
 import splat.lexer.Token;
 import splat.parser.elements.Expression;
 import splat.parser.elements.FunctionDecl;
+import splat.parser.elements.Statement;
+import splat.parser.elements.VariableDecl;
 import splat.parser.elements.constants.types.Type;
 import splat.semanticanalyzer.SemanticAnalysisException;
 import utils.Utils;
@@ -59,6 +66,33 @@ public class CallExpr extends Expression {
 		}
 
 		return func.getRetType();
+	}
+
+	@Override
+	public Value evaluate(Map<String, FunctionDecl> funcMap, Map<String, Value> varAndParamMap)
+			throws ExecutionException {
+		FunctionDecl func = funcMap.get(label.getTok().getValue());
+		Map<String, Value> newVarAndParamMap = new HashMap<String, Value>();
+
+		for (VariableDecl varDecl : func.getLocVarDecls()) {
+			newVarAndParamMap.put(varDecl.getLabel().getTok().getValue(), ValueFac.createValue(varDecl.getType()));
+		}
+
+		for (int i = 0; i < args.size(); i++) {
+			newVarAndParamMap.put(func.getParams().get(i).getLabel().getTok().getValue(),
+					args.get(i).evaluate(funcMap, varAndParamMap));
+		}
+
+		for (Statement stmt : func.getStmts()) {
+			try {
+				stmt.execute(funcMap, newVarAndParamMap);
+			} catch (ReturnFromCall e) {
+				// TODO Auto-generated catch block
+				return e.getReturnVal();
+			}
+		}
+
+		return null;
 	}
 
 }

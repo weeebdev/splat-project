@@ -2,6 +2,9 @@ package splat.parser.elements.statements;
 
 import java.util.Map;
 
+import splat.executor.ExecutionException;
+import splat.executor.ReturnFromCall;
+import splat.executor.Value;
 import splat.lexer.Token;
 import splat.parser.elements.Expression;
 import splat.parser.elements.FunctionDecl;
@@ -41,5 +44,12 @@ public class AssignmentStmt extends Statement {
 		if (!labelType.equalsTo(exprType)) {
 			throw new SemanticAnalysisException("Type mismatch in assignment statement", this);
 		}
+	}
+
+	@Override
+	public void execute(Map<String, FunctionDecl> funcMap, Map<String, Value> varAndParamMap)
+			throws ReturnFromCall, ExecutionException {
+		Value val = expr.evaluate(funcMap, varAndParamMap);
+		varAndParamMap.put(label.getTok().getValue(), val);
 	}
 }

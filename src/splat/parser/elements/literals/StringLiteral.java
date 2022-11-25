@@ -2,6 +2,9 @@ package splat.parser.elements.literals;
 
 import java.util.Map;
 
+import splat.executor.ExecutionException;
+import splat.executor.Value;
+import splat.executor.values.ValueFac;
 import splat.lexer.Token;
 import splat.parser.elements.FunctionDecl;
 import splat.parser.elements.constants.types.Type;
@@ -32,5 +35,11 @@ public class StringLiteral extends Literal {
 	public Type analyzeAndGetType(Map<String, FunctionDecl> funcMap, Map<String, Type> varAndParamMap)
 			throws SemanticAnalysisException {
 		return new Type(Type.STRING);
+	}
+
+	@Override
+	public Value evaluate(Map<String, FunctionDecl> funcMap, Map<String, Value> varAndParamMap)
+			throws ExecutionException {
+		return ValueFac.createValue(Type.STRING, tok.getValue().replaceAll("\"", ""));
 	}
 }

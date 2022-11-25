@@ -3,6 +3,8 @@ package splat.parser.elements.expressions;
 import java.util.Arrays;
 import java.util.Map;
 
+import splat.executor.ExecutionException;
+import splat.executor.Value;
 import splat.lexer.Token;
 import splat.parser.elements.Expression;
 import splat.parser.elements.FunctionDecl;
@@ -40,5 +42,11 @@ public class LabelExpr extends Expression {
 					tok.getLine(), tok.getColumn());
 		}
 		return type;
+	}
+
+	@Override
+	public Value evaluate(Map<String, FunctionDecl> funcMap, Map<String, Value> varAndParamMap)
+			throws ExecutionException {
+		return varAndParamMap.get(tok.getValue());
 	}
 }

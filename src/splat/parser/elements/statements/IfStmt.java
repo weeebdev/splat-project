@@ -3,6 +3,9 @@ package splat.parser.elements.statements;
 import java.util.List;
 import java.util.Map;
 
+import splat.executor.ExecutionException;
+import splat.executor.ReturnFromCall;
+import splat.executor.Value;
 import splat.lexer.Token;
 import splat.parser.elements.Expression;
 import splat.parser.elements.FunctionDecl;
@@ -60,6 +63,23 @@ public class IfStmt extends Statement {
 		if (stmt2 != null) {
 			for (Statement stmt : stmt2) {
 				stmt.analyze(funcMap, varAndParamMap);
+			}
+		}
+	}
+
+	@Override
+	public void execute(Map<String, FunctionDecl> funcMap, Map<String, Value> varAndParamMap)
+			throws ReturnFromCall, ExecutionException {
+		boolean b = (boolean) expr.evaluate(funcMap, varAndParamMap).getValue();
+		if (b) {
+			for (Statement stmt : stmt1) {
+				stmt.execute(funcMap, varAndParamMap);
+			}
+		} else {
+			if (stmt2 != null) {
+				for (Statement stmt : stmt2) {
+					stmt.execute(funcMap, varAndParamMap);
+				}
 			}
 		}
 	}

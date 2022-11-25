@@ -2,6 +2,7 @@ package splat.semanticanalyzer;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -13,7 +14,9 @@ import splat.parser.elements.Statement;
 import splat.parser.elements.VariableDecl;
 import splat.parser.elements.constants.types.RetType;
 import splat.parser.elements.constants.types.Type;
+import splat.parser.elements.statements.IfStmt;
 import splat.parser.elements.statements.ReturnStmt;
+import splat.parser.elements.statements.WhileStmt;
 
 public class SemanticAnalyzer {
 
@@ -52,29 +55,48 @@ public class SemanticAnalyzer {
 	}
 
 	private void analyzeFuncDecl(FunctionDecl funcDecl) throws SemanticAnalysisException {
-		
+
 		// Checks to make sure we don't use the same labels more than once
 		// among our function parameters, local variables, and function names
 		checkNoDuplicateFuncLabels(funcDecl);
-		
+
 		// Get the types of the parameters and local variables
 		Map<String, Type> varAndParamMap = getVarAndParamMap(funcDecl);
-		
+
 		// Perform semantic analysis on the function body
-		boolean returnStmtFound = false;
 		for (Statement stmt : funcDecl.getStmts()) {
 			stmt.analyze(funcMap, varAndParamMap);
-			if (stmt instanceof ReturnStmt) {
-				returnStmtFound = true;
-			}
 		}
 
 		// Had to modify the predefined function, sorry
-		if (!returnStmtFound && !funcDecl.getRetType().equalsTo(RetType.VOID)) {
+		if (!checkReturnStmtExistence(funcDecl.getStmts()) && !funcDecl.getRetType().equalsTo(RetType.VOID)) {
 			throw new SemanticAnalysisException("Function does not return a value", funcDecl);
 		}
 	}
-	
+
+	private boolean checkReturnStmtExistence(List<Statement> stmts) {
+		boolean returnStmtFound = false;
+		for (Statement stmt : stmts) {
+			if (stmt instanceof ReturnStmt) {
+				returnStmtFound = true;
+			}
+
+			if (stmt instanceof IfStmt) {
+				IfStmt ifStmt = (IfStmt) stmt;
+				returnStmtFound |= checkReturnStmtExistence(ifStmt.getStmt1());
+				if (ifStmt.getStmt2() != null) {
+					returnStmtFound |= checkReturnStmtExistence(ifStmt.getStmt2());
+				}
+			}
+
+			if (stmt instanceof WhileStmt) {
+				WhileStmt whileStmt = (WhileStmt) stmt;
+				returnStmtFound |= checkReturnStmtExistence(whileStmt.getStmt());
+			}
+		}
+
+		return returnStmtFound;
+	}
 	
 	private Map<String, Type> getVarAndParamMap(FunctionDecl funcDecl) {
 		
