@@ -35,6 +35,10 @@ public enum BinaryOperator implements IKeyword {
 		return Stream.of(values()).map(t -> t.toString()).toArray(String[]::new);
 	}
 
+	public boolean equals(BinaryOperator... operators) {
+		return Stream.of(operators).anyMatch(op -> op.equals(this));
+	}
+
 	public String getName() {
 		return name;
 	}

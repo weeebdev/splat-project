@@ -1,36 +1,50 @@
 package splat.parser.elements.constants.types;
 
-import java.util.stream.Stream;
-
 import splat.parser.elements.constants.keyword.IKeyword;
 
-public enum Type implements IKeyword {
-	INTEGER("Integer"),
-	BOOLEAN("Boolean"),
-	STRING("String");
-
-	private String name;
-
-	private Type(String name) {
-		this.name = name;
-	}
-
-	public String getName() {
-		return name;
-	}
-
-	public static Type getEnum(String name) {
-		return Stream.of(Type.values())
-				.filter(type -> type.name.equals(name))
-				.findFirst()
-				.orElse(null);
-	}
+public class Type implements IKeyword {
+	public static final String INTEGER = "Integer";
+	public static final String BOOLEAN = "Boolean";
+	public static final String STRING = "String";
+	private String type = null;
 
 	public static String[] getValues() {
-		return Stream.of(values()).map(t -> t.toString()).toArray(String[]::new);
+		return new String[] { INTEGER, BOOLEAN, STRING };
+	}
+
+	public Type(String type) {
+		if (type.equals(INTEGER) || type.equals(BOOLEAN) || type.equals(STRING)) {
+			this.type = type;
+		}
+	}
+
+	public String getType() {
+		return type;
 	}
 
 	public String toString() {
-		return name;
+		return type;
+	}
+
+	public boolean equalsTo(String type) {
+		if (this instanceof RetType) {
+			return ((RetType) this).getType().equals(type);
+		}
+
+		return this.type.equals(type);
+
+	}
+
+	public boolean equalsTo(Type type) {
+		if (type instanceof RetType) {
+			return this.type.equals(((RetType) type).getType());
+		}
+
+		if (this instanceof RetType) {
+			return ((RetType) this).getType().equals(type.getType());
+		}
+
+		return this.type.equals(type.getType());
+
 	}
 }

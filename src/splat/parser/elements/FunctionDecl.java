@@ -13,7 +13,6 @@ import utils.Utils;
 	 */
 public class FunctionDecl extends Declaration {
 
-	private LabelExpr label;
 	private List<ParameterDecl> params;
 	private RetType retType;
 	private List<VariableDecl> locVarDecls;
@@ -24,15 +23,11 @@ public class FunctionDecl extends Declaration {
 			RetType retType,
 			List<VariableDecl> locVarDecls, List<Statement> stmts) {
 		super(tok);
-		this.label = label;
+		super.setLabel(label);
 		this.params = params;
 		this.retType = retType;
 		this.locVarDecls = locVarDecls;
 		this.stmts = stmts;
-	}
-
-	public LabelExpr getLabel() {
-		return label;
 	}
 
 	public List<ParameterDecl> getParams() {
@@ -52,7 +47,7 @@ public class FunctionDecl extends Declaration {
 	}
 
 	public String toString() {
-		String result = label + " (";
+		String result = super.getLabel() + " (";
 		result += Utils.formatArray(params, ", ");
 		result += ") : " + retType + " is\n";
 

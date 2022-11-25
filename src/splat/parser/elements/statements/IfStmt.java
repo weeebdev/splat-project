@@ -1,10 +1,14 @@
 package splat.parser.elements.statements;
 
 import java.util.List;
+import java.util.Map;
 
 import splat.lexer.Token;
 import splat.parser.elements.Expression;
+import splat.parser.elements.FunctionDecl;
 import splat.parser.elements.Statement;
+import splat.parser.elements.constants.types.Type;
+import splat.semanticanalyzer.SemanticAnalysisException;
 import utils.Utils;
 
 public class IfStmt extends Statement {
@@ -40,5 +44,23 @@ public class IfStmt extends Statement {
 		}
 		result += "\n" + Utils.TAB + "end if;";
 		return result;
+	}
+
+	@Override
+	public void analyze(Map<String, FunctionDecl> funcMap, Map<String, Type> varAndParamMap)
+			throws SemanticAnalysisException {
+		if (!expr.analyzeAndGetType(funcMap, varAndParamMap).equalsTo(Type.BOOLEAN)) {
+			throw new SemanticAnalysisException("If statement condition must be of type bool", this);
+		}
+
+		for (Statement stmt : stmt1) {
+			stmt.analyze(funcMap, varAndParamMap);
+		}
+
+		if (stmt2 != null) {
+			for (Statement stmt : stmt2) {
+				stmt.analyze(funcMap, varAndParamMap);
+			}
+		}
 	}
 }

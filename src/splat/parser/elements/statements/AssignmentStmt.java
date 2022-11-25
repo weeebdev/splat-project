@@ -1,9 +1,14 @@
 package splat.parser.elements.statements;
 
+import java.util.Map;
+
 import splat.lexer.Token;
 import splat.parser.elements.Expression;
+import splat.parser.elements.FunctionDecl;
 import splat.parser.elements.Statement;
+import splat.parser.elements.constants.types.Type;
 import splat.parser.elements.expressions.LabelExpr;
+import splat.semanticanalyzer.SemanticAnalysisException;
 
 public class AssignmentStmt extends Statement {
 	private LabelExpr label;
@@ -25,5 +30,16 @@ public class AssignmentStmt extends Statement {
 
 	public String toString() {
 		return String.format("%s := %s;", label, expr);
+	}
+
+	@Override
+	public void analyze(Map<String, FunctionDecl> funcMap, Map<String, Type> varAndParamMap)
+			throws SemanticAnalysisException {
+		Type labelType = label.analyzeAndGetType(funcMap, varAndParamMap);
+		Type exprType = expr.analyzeAndGetType(funcMap, varAndParamMap);
+
+		if (!labelType.equalsTo(exprType)) {
+			throw new SemanticAnalysisException("Type mismatch in assignment statement", this);
+		}
 	}
 }

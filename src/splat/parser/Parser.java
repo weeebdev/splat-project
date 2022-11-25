@@ -400,11 +400,13 @@ public class Parser {
 			}
 		} else if (peekTwoAhead(Keyword.OPEN_PAREN)) {
 			return parseCallExpr();
+		} else if (LiteralFac.isValid(tokens.get(0).getValue())) {
+			return parseLiteral();
 		} else if (LabelExpr.isValid(tokens.get(0).getValue())) {
 			return parseLabel();
-		} else {
-			return parseLiteral();
 		}
+
+		throw new ParseException("Undefined expression type", tokens.get(0));
 	}
 
 	/*
@@ -499,7 +501,7 @@ public class Parser {
 	private Type parseType() throws ParseException {
 		if (this.peekNext(Type.getValues())) {
 			String value = this.tokens.remove(0).getValue();
-			return Type.getEnum(value);
+			return new Type(value);
 		} else {
 			throw new ParseException("Type expected", tokens.get(0));
 		}
@@ -511,7 +513,7 @@ public class Parser {
 	private RetType parseRetType() throws ParseException {
 		if (this.peekNext(RetType.getValues())) {
 			String value = this.tokens.remove(0).getValue();
-			return RetType.getEnum(value);
+			return new RetType(value);
 		} else {
 			throw new ParseException("Type expected", tokens.get(0));
 		}

@@ -1,15 +1,19 @@
 package splat.semanticanalyzer;
 
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
 import splat.parser.elements.Declaration;
 import splat.parser.elements.FunctionDecl;
+import splat.parser.elements.ParameterDecl;
 import splat.parser.elements.ProgramAST;
 import splat.parser.elements.Statement;
-import splat.parser.elements.Type;
 import splat.parser.elements.VariableDecl;
+import splat.parser.elements.constants.types.RetType;
+import splat.parser.elements.constants.types.Type;
+import splat.parser.elements.statements.ReturnStmt;
 
 public class SemanticAnalyzer {
 
@@ -20,6 +24,8 @@ public class SemanticAnalyzer {
 	
 	public SemanticAnalyzer(ProgramAST progAST) {
 		this.progAST = progAST;
+		this.funcMap = new HashMap<String, FunctionDecl>();
+		this.progVarMap = new HashMap<String, Type>();
 	}
 
 	public void analyze() throws SemanticAnalysisException {
@@ -55,22 +61,63 @@ public class SemanticAnalyzer {
 		Map<String, Type> varAndParamMap = getVarAndParamMap(funcDecl);
 		
 		// Perform semantic analysis on the function body
+		boolean returnStmtFound = false;
 		for (Statement stmt : funcDecl.getStmts()) {
 			stmt.analyze(funcMap, varAndParamMap);
+			if (stmt instanceof ReturnStmt) {
+				returnStmtFound = true;
+			}
+		}
+
+		// Had to modify the predefined function, sorry
+		if (!returnStmtFound && !funcDecl.getRetType().equalsTo(RetType.VOID)) {
+			throw new SemanticAnalysisException("Function does not return a value", funcDecl);
 		}
 	}
 	
 	
 	private Map<String, Type> getVarAndParamMap(FunctionDecl funcDecl) {
 		
-		// FIXME: Somewhat similar to setProgVarAndFuncMaps()
-		return null;
+		Map<String, Type> varAndParamMap = new HashMap<>();
+
+		for (ParameterDecl param : funcDecl.getParams()) {
+			varAndParamMap.put(param.getLabel().toString(), param.getType());
+		}
+
+		for (VariableDecl decl : funcDecl.getLocVarDecls()) {
+			varAndParamMap.put(decl.getLabel().toString(), decl.getType());
+		}
+
+		varAndParamMap.put("return", funcDecl.getRetType());
+
+		return varAndParamMap;
 	}
 
 	private void checkNoDuplicateFuncLabels(FunctionDecl funcDecl) 
 									throws SemanticAnalysisException {
 		
-		// FIXME: Similar to checkNoDuplicateProgLabels()
+		Set<String> labels = new HashSet<>();
+
+		for (FunctionDecl func : funcMap.values()) {
+			if (labels.contains(func.getLabel().toString())) {
+				throw new SemanticAnalysisException("Duplicate function label", func);
+			}
+			labels.add(func.getLabel().toString());
+		}
+
+		for (ParameterDecl param : funcDecl.getParams()) {
+			if (labels.contains(param.getLabel().toString())) {
+				throw new SemanticAnalysisException("Duplicate parameter label: " + param.getLabel(), param);
+			}
+			labels.add(param.getLabel().toString());
+		}
+
+		for (VariableDecl decl : funcDecl.getLocVarDecls()) {
+			if (labels.contains(decl.getLabel().toString())) {
+				throw new SemanticAnalysisException("Duplicate local variable label: " + decl.getLabel(), decl);
+			}
+			labels.add(decl.getLabel().toString());
+		}
 	}
 	
 	private void checkNoDuplicateProgLabels() throws SemanticAnalysisException {

@@ -15,4 +15,8 @@ public class LiteralFac {
 
 		return null;
 	}
+
+	public static boolean isValid(String value) {
+		return StringLiteral.isValid(value) || BoolLiteral.isValid(value) || IntLiteral.isValid(value);
+	}
 }

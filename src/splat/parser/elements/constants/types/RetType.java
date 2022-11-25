@@ -2,42 +2,31 @@ package splat.parser.elements.constants.types;
 
 import java.util.stream.Stream;
 
-import splat.parser.elements.constants.keyword.IKeyword;
-
 // Since enums cannot extend, I have to call methods manually
-public enum RetType implements IKeyword {
+public class RetType extends Type {
+	public static final String VOID = "void";
+	private String type = null;
 
-	VOID("void");
-
-	private String name;
-
-	private RetType(String name) {
-		this.name = name;
-	}
-
-	public String getName() {
-		return name;
-	}
-
-	public static RetType getEnum(String name) {
-		IKeyword retType = Type.getEnum(name);
-		if (retType != null) {
-			retType = Stream.of(RetType.values())
-					.filter(type -> type.name.equals(name))
-					.findFirst()
-					.orElse(null);
+	public RetType(String type) {
+		super(type);
+		this.type = super.getType();
+		if (type.equals(VOID)) {
+			this.type = type;
 		}
+	}
 
-		return (RetType) retType;
+	@Override
+	public String getType() {
+		return type;
+	}
+
+	@Override
+	public String toString() {
+		return type;
 	}
 
 	public static String[] getValues() {
-		Type[] types = Type.values();
-		RetType[] retTypes = RetType.values();
-		return Stream.concat(Stream.of(types), Stream.of(retTypes)).map(t -> t.toString()).toArray(String[]::new);
-	}
-
-	public String toString() {
-		return name;
+		String[] values = Stream.concat(Stream.of(VOID), Stream.of(Type.getValues())).toArray(String[]::new);
+		return values;
 	}
 }
