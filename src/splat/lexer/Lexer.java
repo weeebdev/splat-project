@@ -21,6 +21,8 @@ public class Lexer {
 	// symbols which are part of the complex operators, but invalid individually.
 	// blackList must be in whitelist
 	private final List<String> blacklist = Arrays.asList("=");
+	// there is a problem with TAB (\t), because some editors treat them like 4
+	// spaces, others as 1 character. For now \t takes 1 column.
 	private final List<Character> delimiters = Arrays.asList(' ', '\t', '\n', '\r');
 
 	private String lexeme = "";
@@ -81,7 +83,7 @@ public class Lexer {
 						lexeme = "";
 					}
 					// and update col and line if necessary
-					if (delimiters.contains(character) && character != ' ') {
+					if (character == '\n') {
 						col = 0;
 						line++;
 					}
@@ -105,7 +107,7 @@ public class Lexer {
 					}
 
 					// if char is delimiter but no cr or whitespace, then update col and line
-					if (character != ' ' && character != '\r') {
+					if (character == '\n') {
 						col = 0;
 						line++;
 					}
